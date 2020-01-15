@@ -7,7 +7,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/userRegister',async function(req,res,next){
-  var input = {userName : "hwz",password:"222"}
+  console.log(req.body)
+  var input = {userName : "abcd",password:"222",sex:0}
   var res = await userManagementService.userRegister(input);
   console.log(res)
 })

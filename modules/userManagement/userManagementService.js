@@ -23,6 +23,26 @@ var userRegister = async function(input){
             message : "用户名已存在"
         };
     }
+    userDto.creationTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
+    userDto.passwordKey  = "PLibrary"+Math.round(Math.random()*100000);
+    userDto.password = globalVariable.cryptoPassFunc(userDto.passwordKey+input.password+userDto.creationTime);
+    userDto.userName = input.userName;
+    userDto.phoneNumber = input.phoneNumber;
+    userDto.email = input.email;
+    userDto.sex = input.sex;
+    userDto.permission = 1;
+    globalVariable.Variables.userInfo.id = 1;
+    var insertRes = await sqlControler.insertColumn(userDto);
+    if(insertRes.insertId){
+        return await {
+            type : "SUCCESS",
+            message : "注册成功"
+        }
+    }
+    return await{
+        type : "ERROR",
+        message : "注册失败"
+    }
 }
 
 exports.userRegister = userRegister;

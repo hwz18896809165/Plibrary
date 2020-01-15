@@ -1,23 +1,5 @@
 var sqlConnection = require('./sqlConnectSetting');
-
-Date.prototype.Format = function(fmt)   
-{   
-  var o = {   
-    "M+" : this.getMonth()+1,                 //月份   
-    "d+" : this.getDate(),                    //日   
-    "h+" : this.getHours(),                   //小时   
-    "m+" : this.getMinutes(),                 //分   
-    "s+" : this.getSeconds(),                 //秒   
-    "q+" : Math.floor((this.getMonth()+3)/3), //季度   
-    "S"  : this.getMilliseconds()             //毫秒   
-  };   
-  if(/(y+)/.test(fmt))   
-    fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));   
-  for(var k in o)   
-    if(new RegExp("("+ k +")").test(fmt))   
-  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));   
-  return fmt;   
-}
+var variables = require("../baseControl/globalVariableManagement").Variables
 
 var createTable = async function(tableClass) {
     this.sqlParams = "create table "+tableClass.tableName+"(";
@@ -73,9 +55,9 @@ var createTable = async function(tableClass) {
 }
 
 var insertColumn = async function(tableClass){
-    tableClass.creationTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
-    tableClass.creatorUserId = 0;
-    tableClass.lastUpdateUserId = 0;
+    tableClass.creationTime = tableClass.creationTime?tableClass.creationTime:new Date().Format("yyyy-MM-dd hh:mm:ss");
+    tableClass.creatorUserId = variables.userInfo.id;
+    tableClass.lastUpdateUserId = variables.userInfo.id;
     this.sqlParams = "insert into "+tableClass.tableName+" (";
     var sqlParams2 = "values ("
     for(var colmun in tableClass){
@@ -87,7 +69,7 @@ var insertColumn = async function(tableClass){
     this.sqlParams = this.sqlParams.substring(0,this.sqlParams.length-1)+") ";
     this.sqlParams += sqlParams2.substring(0,sqlParams2.length-1) + ");";
     var res = await commitSql(this.sqlParams);
-    return res;
+    return JSON.parse(res);
 }
 
 var getColumnById = async function(tableName,id){
@@ -110,8 +92,7 @@ var deleteColumnById = async function(tableName,id){
 
 var updateColumnById = async function(tableClass){
     tableClass.creationTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
-    tableClass.creatorUserId = 0;
-    tableClass.lastUpdateUserId = 0;
+    tableClass.lastUpdateUserId = variables.userInfo.id;
     this.sqlParams = "update "+tableClass.tableName+" set ";
     for(var colmun in tableClass){
         if(colmun !== "tableName" && colmun !== "id"){
@@ -132,9 +113,7 @@ var commitSql = function(sqlParams) {
     var promise =  new Promise(function(resolve, reject) {
         sqlConnection.query(sqlParams,function(err,res) {
             if(err){
-                if(err.errno === 1050){
-                    resolve(null);
-                }
+                resolve(JSON.stringify(err))
             }
             else{
                 resolve(JSON.stringify(res));
