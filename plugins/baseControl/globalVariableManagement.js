@@ -8,7 +8,9 @@ var cryptoPassFunc = function(password) {
 var Variables = {
     userInfo:{
         id :"",
-        userKey : ""
+        userKey : "",
+        permission:"",
+        userLoginType:false
     }
 }
 

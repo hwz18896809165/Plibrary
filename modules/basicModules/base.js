@@ -3,8 +3,8 @@ class Base{
         this.tableName = tableName;
         this.id = this.SetColumn("int",20,true,null,true)
         this.creationTime = this.SetColumn("datetime",null,true)
-        this.creatorUserId = this.SetColumn("int",20,true)
-        this.lastUpdateUserId = this.SetColumn("int",20,true)
+        this.creatorUserId = this.SetColumn("int",20)
+        this.lastUpdateUserId = this.SetColumn("int",20)
         this.primaryKey = "";
         this.foreignKey = {};
         this.index = {};

@@ -56,8 +56,10 @@ var createTable = async function(tableClass) {
 
 var insertColumn = async function(tableClass){
     tableClass.creationTime = tableClass.creationTime?tableClass.creationTime:new Date().Format("yyyy-MM-dd hh:mm:ss");
-    tableClass.creatorUserId = variables.userInfo.id;
-    tableClass.lastUpdateUserId = variables.userInfo.id;
+    if(variables.userInfo.id !== ""){
+        tableClass.creatorUserId = variables.userInfo.id;
+        tableClass.lastUpdateUserId = variables.userInfo.id;
+    }
     this.sqlParams = "insert into "+tableClass.tableName+" (";
     var sqlParams2 = "values ("
     for(var colmun in tableClass){
