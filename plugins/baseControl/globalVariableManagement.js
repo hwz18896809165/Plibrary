@@ -5,15 +5,10 @@ var cryptoPassFunc = function(password) {
     return md5.update(password).digest('hex');
 };
 
-var Variables = {
-    userInfo:{
-        id :"",
-        userKey : "",
-        permission:"",
-        userLoginType:false
-    }
-}
-
+var User = {
+    users : {},
+    connectingUsers : {}
+};
 
 var isEmptyObject = function(obj) {
     for (var key in obj) {
@@ -41,6 +36,15 @@ Date.prototype.Format = function(fmt)
   return fmt;   
 }
 
-exports.Variables = Variables;
+function findUserByName(userName){
+  if(userName in User.users){
+    return User.users[userName];
+  }
+  return null;
+}
+
+
+exports.User = User;
 exports.isEmptyObject = isEmptyObject;
 exports.cryptoPassFunc = cryptoPassFunc;
+exports.findUserByName = findUserByName;

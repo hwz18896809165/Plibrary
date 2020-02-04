@@ -1,5 +1,5 @@
 var sqlConnection = require('./sqlConnectSetting');
-var variables = require("../baseControl/globalVariableManagement").Variables
+var findUserByUserKey = require("../baseControl/globalVariableManagement").findUserByUserKey
 
 var createTable = async function(tableClass) {
     this.sqlParams = "create table "+tableClass.tableName+"(";
@@ -54,11 +54,11 @@ var createTable = async function(tableClass) {
     return res;
 }
 
-var insertColumn = async function(tableClass){
+var insertColumn = async function(tableClass,userKey = ""){
     tableClass.creationTime = tableClass.creationTime?tableClass.creationTime:new Date().Format("yyyy-MM-dd hh:mm:ss");
-    if(variables.userInfo.id !== ""){
-        tableClass.creatorUserId = variables.userInfo.id;
-        tableClass.lastUpdateUserId = variables.userInfo.id;
+    if(userKey !== ""){
+        tableClass.creatorUserId = findUserByUserKey(userKey).id;
+        tableClass.lastUpdateUserId = findUserByUserKey(userKey).id;
     }
     this.sqlParams = "insert into "+tableClass.tableName+" (";
     var sqlParams2 = "values ("
@@ -86,15 +86,17 @@ var getAllColumns = async function(tableName){
     return JSON.parse(res);
 }
 
-var deleteColumnById = async function(tableName,id){
+var deleteColumnById = async function(tableName,id,userKey=""){
     this.sqlParams = "delete from "+tableName+" where id="+id+";";
     var res = await commitSql(this.sqlParams);
     return res;
 }
 
-var updateColumnById = async function(tableClass){
+var updateColumnById = async function(tableClass,userKey = ""){
     tableClass.creationTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
-    tableClass.lastUpdateUserId = variables.userInfo.id;
+    if(userKey !== ""){
+        tableClass.lastUpdateUserId = findUserByUserKey(userKey).id;
+    }
     this.sqlParams = "update "+tableClass.tableName+" set ";
     for(var colmun in tableClass){
         if(colmun !== "tableName" && colmun !== "id"){
