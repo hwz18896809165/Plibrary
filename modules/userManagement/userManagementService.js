@@ -3,6 +3,7 @@ var userDto = require("./user").userDto;
 var userTableName = require("./user").tableName;
 var globalVariable = require("../../plugins/baseControl/globalVariableManagement");
 var mailManagement = require("../../plugins/baseControl/mailManagement");
+var pageManagement = require("../../plugins/baseControl/pagesManagement");
 
 var userRegister = async function(input){
     if(globalVariable.isEmptyObject(input) || input.userName === "" || input.password === "" || input.email === ""){
@@ -148,13 +149,21 @@ var getAllUser = async function(input){
     if(userInfo.permission !== 1){
         return await{
             type : "FAILED",
-            message : "您没有该权限"
+            message : "您没有该权限",
+            draw :Number(input.draw),
+            recordsTotal : 0,
+            recordsFiltered :0 ,
+            data : []
         }
     }
     if(userInfo.userKey !== input.userKey){
         return await{
             type : "FAILED",
-            message : "获取失败！"
+            message : "获取失败！",
+            draw :Number(input.draw),
+            recordsTotal : 0,
+            recordsFiltered :0 ,
+            data : []
         }
     }
     var users = await sqlControler.getAllColumns(userTableName);
@@ -184,10 +193,23 @@ var getAllUser = async function(input){
             userInfos.push(userDto);
         }
     }
+    userInfos.sort(function(a,b){
+        return Number(new Date(a.creationTime)) - Number(new Date(b.creationTime))
+    })
+    if(input['search[userName]'] !== ""){
+        userInfos = pageManagement.search(userInfos,'userName',input['search[userName]']);
+    }
+    if(input['search[identity]'] !== ""){
+        userInfos = pageManagement.search(userInfos,'identity',input['search[identity]']);
+    }
+    var results  =pageManagement.paging(userInfos,input.start,input.length);
     return await{
         type : "SUCCESS",
         message : "获取成功",
-        userInfo : userInfos
+        draw :Number(input.draw),
+        recordsTotal : userInfos.length,
+        recordsFiltered :userInfos.length,
+        data : results
     }
 
 }
