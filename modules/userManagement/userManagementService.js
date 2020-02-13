@@ -145,6 +145,7 @@ var userLogout = async function(input){
 
 
 var getAllUser = async function(input){
+    console.log(input)
     var userInfo = globalVariable.findUserByName(input.userName);
     if(userInfo.permission !== 1){
         return await{
@@ -167,6 +168,7 @@ var getAllUser = async function(input){
         }
     }
     var users = await sqlControler.getAllColumns(userTableName);
+    console.log(users)
     var userInfos = []
     if(users.length>0){
         for(var userIndex in users){
@@ -193,6 +195,7 @@ var getAllUser = async function(input){
             userInfos.push(userDto);
         }
     }
+    console.log(userInfos)
     userInfos.sort(function(a,b){
         return Number(new Date(a.creationTime)) - Number(new Date(b.creationTime))
     })
